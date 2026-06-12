@@ -1,16 +1,34 @@
-# React + Vite
+# SaaS Template
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Full-stack SaaS başlangıç şablonu. React + FastAPI + PostgreSQL ile kurulmuş, JWT authentication içerir.
 
-Currently, two official plugins are available:
+## Özellikler
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 🔐 Login / Register sayfaları (form validasyonu ile)
+- 🛡️ Korumalı route yapısı (JWT token bazlı)
+- 📊 Dashboard — kullanıcı bilgisi, metrikler, aktivite akışı
+- ⚙️ Ayarlar sayfası — profil güncelleme, şifre değiştirme
+- 🎨 Tailwind CSS ile responsive tasarım
 
-## React Compiler
+## Teknolojiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**Frontend:** React, Vite, React Router, Tailwind CSS  
+**Backend:** FastAPI, PostgreSQL, SQLAlchemy, JWT (yakında)
 
-## Expanding the ESLint configuration
+## Kurulum
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Durum
+
+🚧 Aktif geliştirme aşamasında. Frontend tamamlandı, backend entegrasyonu devam ediyor.
+
+## Yol haritası
+
+- [ ] FastAPI backend + JWT auth
+- [ ] PostgreSQL bağlantısı
+- [ ] Render üzerinde deploy
+- [ ] CI/CD (GitHub Actions)
