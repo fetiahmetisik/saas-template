@@ -1,25 +1,37 @@
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { getMe } from "../api"
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  // Şimdilik sahte kullanıcı — backend gelince burası API'den gelecek
-  const user = {
-    name: "Feti Yıldız",
-    email: "test@test.com",
-    plan: "Free",
-    joined: "Haziran 2026",
-  }
+  useEffect(() => {
+    getMe()
+      .then((res) => setUser(res.data))
+      .catch(() => {
+        localStorage.removeItem("token")
+        navigate("/login")
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
   function handleLogout() {
     localStorage.removeItem("token")
     navigate("/login")
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-sm text-gray-400">Yükleniyor...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* Navbar */}
       <nav className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <span className="font-semibold text-gray-800">SaaS Template</span>
@@ -42,18 +54,17 @@ export default function Dashboard() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
-
-        {/* Karşılama */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-800">
             Hoş geldin, {user.name} 👋
           </h2>
           <p className="text-sm text-gray-500 mt-1">
-            Hesabın {user.joined} tarihinde oluşturuldu.
+            Hesabın {new Date(user.created_at).toLocaleDateString("tr-TR", {
+              year: "numeric", month: "long", day: "numeric"
+            })} tarihinde oluşturuldu.
           </p>
         </div>
 
-        {/* Metrik kartlar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
             { label: "Toplam kullanıcı", value: "128" },
@@ -67,7 +78,6 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Profil kartı */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
           <h3 className="text-sm font-medium text-gray-700 mb-4">Profil bilgileri</h3>
           <div className="flex flex-col gap-3">
@@ -75,7 +85,6 @@ export default function Dashboard() {
               { label: "Ad Soyad", value: user.name },
               { label: "E-posta", value: user.email },
               { label: "Plan", value: user.plan },
-              { label: "Üyelik tarihi", value: user.joined },
             ].map((row) => (
               <div key={row.label} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                 <span className="text-sm text-gray-500">{row.label}</span>
@@ -85,7 +94,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Son aktivite */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="text-sm font-medium text-gray-700 mb-4">Son aktivite</h3>
           <div className="flex flex-col gap-2">
@@ -95,17 +103,14 @@ export default function Dashboard() {
               { action: "Ayarlar açıldı", time: "5 dk önce", color: "bg-gray-100 text-gray-600" },
             ].map((item, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${item.color}`}>
-                    {item.action}
-                  </span>
-                </div>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${item.color}`}>
+                  {item.action}
+                </span>
                 <span className="text-xs text-gray-400">{item.time}</span>
               </div>
             ))}
           </div>
         </div>
-
       </main>
     </div>
   )

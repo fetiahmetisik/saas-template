@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { loginUser } from "../api"
 
 export default function Login() {
   const navigate = useNavigate()
@@ -22,17 +23,19 @@ export default function Login() {
 
     setLoading(true)
 
-    // Şimdilik sahte auth — backend gelince burası değişecek
-    await new Promise((r) => setTimeout(r, 800))
-
-    if (form.email === "test@test.com" && form.password === "123456") {
-      localStorage.setItem("token", "sahte-token-123")
+    try {
+      const res = await loginUser(form)
+      localStorage.setItem("token", res.data.access_token)
       navigate("/dashboard")
-    } else {
-      setError("E-posta veya şifre hatalı.")
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError("E-posta veya şifre hatalı.")
+      } else {
+        setError("Bir hata oluştu, tekrar dene.")
+      }
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
