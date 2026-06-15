@@ -53,3 +53,40 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 @router.get("/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+@router.put("/me", response_model=schemas.UserOut)
+def update_me(
+    data: schemas.UserUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    existing = (
+        db.query(models.User)
+        .filter(models.User.email == data.email, models.User.id != current_user.id)
+        .first()
+    )
+    if existing:
+        raise HTTPException(status_code=400, detail="Bu e-posta zaten kullanılıyor.")
+
+    current_user.name = data.name
+    current_user.email = data.email
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.put("/me/password")
+def update_password(
+    data: schemas.PasswordUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not auth.verify_password(data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Mevcut şifre hatalı.")
+
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalı.")
+
+    current_user.hashed_password = auth.hash_password(data.new_password)
+    db.commit()
+    return {"message": "Şifre güncellendi."}
